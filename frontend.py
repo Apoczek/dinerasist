@@ -21,8 +21,8 @@ sb1.grid(row=1, column=3, rowspan=3, sticky=N+S)
 l2 = Label(left_frame, text='Składniki')
 l2.grid(row=4, column=0)
 
-ingrediets_print = Listbox(left_frame, height=10, width=40)
-ingrediets_print.grid(row=5, column=0, rowspan=5, columnspan=3)
+ingredients_print = Listbox(left_frame, height=10, width=40)
+ingredients_print.grid(row=5, column=0, rowspan=5, columnspan=3)
 
 sb2 = Scrollbar(left_frame)
 sb2.grid(row=5, column=3, rowspan=5, sticky=N+S)
