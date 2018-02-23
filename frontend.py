@@ -1,3 +1,10 @@
+#You don't know what will be for dinner?
+#Use this application.
+#Add Your options to the database and then draw one of the by random.
+#Simple and completly not necessary programm :)
+#author: Artur Kosior
+
+
 from tkinter import *
 from backend import Database
 
