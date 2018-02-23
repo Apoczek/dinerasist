@@ -1,5 +1,5 @@
 from tkinter import *
-import backend
+from backend import Database
 
 def get_selected_line(event):
     try:
@@ -14,27 +14,28 @@ def get_selected_line(event):
 
 def random_command():
     ideas_print.delete(0, END)
-    row = backend.draw()
+    row = database.draw()
     ideas_print.insert(0, row)
     pass
 
 def all_command():
     ideas_print.delete(0, END)
-    for row in backend.all():
+    for row in database.all():
         ideas_print.insert(END, row)
 
 def add_command():
-    backend.insert(danie_text.get())
+    database.insert(danie_text.get())
     ideas_print.delete(0, END)
     ideas_print.insert(END, danie_text.get())
 
 def delete_command():
-    backend.delete(selected_tuple[0])
+    database.delete(selected_tuple[0])
     all_command()
 
 root = Tk()
 root.title('Dinnerasist')
 root.geometry('400x300')
+database = Database()
 
 left_frame = Frame(root)
 left_frame.pack(side=LEFT)
