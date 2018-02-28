@@ -23,30 +23,36 @@ class Application(Frame):
         try:
             global selected_tuple
             index = self.ideas_print.curselection()[0]
+            #print(index) # for debuging
             selected_tuple = self.ideas_print.get(index)
-            self.e1.delete(0, END)
-            self.e1.insert(END, selected_tuple[1])
+            #print(selected_tuple) # for debuging
+            row = database.show_ingredients(selected_tuple)
+            self.ingredients_print.delete(0, END)
+            self.ingredients_print.insert(0, row[0][0])
         except IndexError:
             pass
 
     def random_command(self):
         self.ideas_print.delete(0, END)
+        self.ingredients_print.delete(0, END)
         row = database.draw()
-        self.ideas_print.insert(0, row)
+        self.ideas_print.insert(0, row[0][1])
+        self.ingredients_print.insert(0, row[0][2])
         pass
 
     def all_command(self):
         self.ideas_print.delete(0, END)
+        self.ingredients_print.delete(0, END)
         for row in database.all():
-            self.ideas_print.insert(END, row)
+            self.ideas_print.insert(END, row[1])
+            #print(row) # for debuging
 
-    def add_command(self):
-        database.insert(self.danie_text.get())
-        self.ideas_print.delete(0, END)
-        self.ideas_print.insert(END, self.danie_text.get())
+    def adding_window(self):
+        self.new_window = Toplevel(self.master)
+        self.app = Adding_window(self.new_window)
 
     def delete_command(self):
-        database.delete(selected_tuple[0])
+        database.delete(selected_tuple)
         self.all_command()
 
     def create_widgets(self):
@@ -76,9 +82,9 @@ class Application(Frame):
         self.ingredients_print.configure(yscrollcommand=sb2.set)
         sb2.configure(command=self.ingredients_print.yview)
 
-        self.danie_text = StringVar()
-        self.e1 = Entry(self.right_frame, textvariable=self.danie_text)
-        self.e1.grid(row=0, column=0, pady=20)
+        # self.danie_text = StringVar()
+        # self.e1 = Entry(self.right_frame, textvariable=self.danie_text)
+        # self.e1.grid(row=0, column=0, pady=20)
 
         b1 = Button(self.right_frame, text='Losuj', height=3, width=12, command=self.random_command)
         b1.grid(row=2, column=0, padx=20)
@@ -86,7 +92,7 @@ class Application(Frame):
         b2 = Button(self.right_frame, text='Wszystkie', width=12, command=self.all_command)
         b2.grid(row=3, column=0)
 
-        b3 = Button(self.right_frame, text='Dodaj', width=12, command=self.add_command)
+        b3 = Button(self.right_frame, text='Dodaj', width=12, command=self.adding_window)
         b3.grid(row=4, column=0)
 
         b4 = Button(self.right_frame, text='Usuń', width=12, command=self.delete_command)
@@ -95,10 +101,46 @@ class Application(Frame):
         b5 = Button(self.right_frame, text='Zamknij', width=12, command=root.destroy)
         b5.grid(row=6, column=0)
 
+class Adding_window:
+    def __init__(self, master):
+        self.master = master
+        self.frame = Frame(self.master)
+        self.master.resizable(0, 0)
+        self.master.title('Dodawanie pomysłu')
+        self.master.geometry('300x180')
+        self.create_adding_widgets()
+
+    def add_command(self):
+        database.insert(self.new_idea.get(), self.new_ingredients.get())
+        self.master.destroy()
+
+    def create_adding_widgets(self):
+
+        l1 = Label(self.master, text='Przepis')
+        l1.grid(row=0, column=0, padx=30, pady=5, sticky='ew')
+
+        self.new_idea = StringVar()
+        self.e1 = Entry(self.master, textvariable=self.new_idea)
+        self.e1.grid(row=1, column=0, columnspan=3, sticky='ew', padx=30, pady=5)
+
+        l2 = Label(self.master, text='Składniki')
+        l2.grid(row=3, column=0, padx=30, pady=5, sticky='ew')
+
+        self.new_ingredients = StringVar()
+        self.e2 = Entry(self.master, textvariable=self.new_ingredients)
+        self.e2.grid(row=4, column=0, columnspan=3, sticky='ew', padx=30, pady=5)
+
+        b1=Button(self.master, text='Dodaj', width=12, command=self.add_command)
+        b1.grid(row=9, column=0, padx=25, pady=10)
+
+        b2=Button(self.master, text='Anuluj', width=12, command=self.master.destroy)
+        b2.grid(row=9, column=1, padx=25, pady=10)
 
 root = Tk()
+root.resizable(0, 0)
 root.title('Dinnerasist')
 root.geometry('400x300')
 app = Application(root)
 database = Database()
 root.mainloop()
+
