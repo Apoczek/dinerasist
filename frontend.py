@@ -6,6 +6,7 @@
 
 
 from tkinter import *
+import tkinter.messagebox as tkmessagebox
 from backend import Database
 
 
@@ -47,13 +48,14 @@ class Application(Frame):
             self.ideas_print.insert(END, row[1])
             #print(row) # for debuging
 
-    def adding_window(self):
+    def adding_window(self): #TODO prevent to double add the same idea
         self.new_window = Toplevel(self.master)
         self.app = Adding_window(self.new_window)
 
     def delete_command(self):
-        database.delete(selected_tuple)
-        self.all_command()
+        if tkmessagebox.askokcancel('Potwierdzenie', 'Na pewno usunąć pomysł?'):
+            database.delete(selected_tuple)
+            self.all_command()
 
     def create_widgets(self):
 
@@ -82,6 +84,8 @@ class Application(Frame):
         self.ingredients_print.configure(yscrollcommand=sb2.set)
         sb2.configure(command=self.ingredients_print.yview)
 
+        # Entry from earlier version
+        #
         # self.danie_text = StringVar()
         # self.e1 = Entry(self.right_frame, textvariable=self.danie_text)
         # self.e1.grid(row=0, column=0, pady=20)
@@ -107,12 +111,14 @@ class Adding_window:
         self.frame = Frame(self.master)
         self.master.resizable(0, 0)
         self.master.title('Dodawanie pomysłu')
-        self.master.geometry('300x180')
+        self.master.geometry('300x180+%d+%d' % (x, y))
         self.create_adding_widgets()
+        self.master.grab_set()
 
     def add_command(self):
-        database.insert(self.new_idea.get(), self.new_ingredients.get())
-        self.master.destroy()
+        if tkmessagebox.askokcancel('Potwierdzenie', 'Na pewno?'):
+            database.insert(self.new_idea.get(), self.new_ingredients.get())
+            self.master.destroy()
 
     def create_adding_widgets(self):
 
@@ -130,7 +136,7 @@ class Adding_window:
         self.e2 = Entry(self.master, textvariable=self.new_ingredients)
         self.e2.grid(row=4, column=0, columnspan=3, sticky='ew', padx=30, pady=5)
 
-        b1=Button(self.master, text='Dodaj', width=12, command=self.add_command)
+        b1=Button(self.master, text='Dodaj', width=12, command=self.add_command) #TODO add 'enter' and 'escape' event
         b1.grid(row=9, column=0, padx=25, pady=10)
 
         b2=Button(self.master, text='Anuluj', width=12, command=self.master.destroy)
@@ -139,7 +145,13 @@ class Adding_window:
 root = Tk()
 root.resizable(0, 0)
 root.title('Dinnerasist')
-root.geometry('400x300')
+ws = root.winfo_screenwidth()
+hs = root.winfo_screenheight()
+w = 400
+h = 300
+x = (ws/2) - (w/2)
+y = (hs/2) - (h/2)
+root.geometry('%dx%d+%d+%d' % (w, h, x, y))
 app = Application(root)
 database = Database()
 root.mainloop()
