@@ -114,11 +114,16 @@ class Adding_window:
         self.master.geometry('300x180+%d+%d' % (x, y))
         self.create_adding_widgets()
         self.master.grab_set()
+        self.master.bind('<Return>', self.add_command)
+        self.master.bind('<Escape>', self.close)
 
-    def add_command(self):
+    def add_command(self, event):
         if tkmessagebox.askokcancel('Potwierdzenie', 'Na pewno?'):
             database.insert(self.new_idea.get(), self.new_ingredients.get())
             self.master.destroy()
+
+    def close(self, event):
+        self.master.destroy()
 
     def create_adding_widgets(self):
 
@@ -128,6 +133,7 @@ class Adding_window:
         self.new_idea = StringVar()
         self.e1 = Entry(self.master, textvariable=self.new_idea)
         self.e1.grid(row=1, column=0, columnspan=3, sticky='ew', padx=30, pady=5)
+        self.e1.focus_set()
 
         l2 = Label(self.master, text='Składniki')
         l2.grid(row=3, column=0, padx=30, pady=5, sticky='ew')
@@ -136,10 +142,10 @@ class Adding_window:
         self.e2 = Entry(self.master, textvariable=self.new_ingredients)
         self.e2.grid(row=4, column=0, columnspan=3, sticky='ew', padx=30, pady=5)
 
-        b1=Button(self.master, text='Dodaj', width=12, command=self.add_command) #TODO add 'enter' and 'escape' event
+        b1 = Button(self.master, text='Dodaj', width=12, command=self.add_command)
         b1.grid(row=9, column=0, padx=25, pady=10)
 
-        b2=Button(self.master, text='Anuluj', width=12, command=self.master.destroy)
+        b2 = Button(self.master, text='Anuluj', width=12, command=self.master.destroy)
         b2.grid(row=9, column=1, padx=25, pady=10)
 
 root = Tk()
