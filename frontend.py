@@ -1,6 +1,6 @@
 #You don't know what will be for dinner?
 #Use this application.
-#Add Your options to the database and then draw one of the by random.
+#Add Your options to the database and then draw one of them by random.
 #Simple and completly not necessary programm :)
 #author: Artur Kosior
 
@@ -24,9 +24,7 @@ class Application(Frame):
         try:
             global selected_tuple
             index = self.ideas_print.curselection()[0]
-            #print(index) # for debuging
-            selected_tuple = self.ideas_print.get(index)
-            #print(selected_tuple) # for debuging
+            selected_tuple = self.ideas_print.get(index).lower()
             row = database.show_ingredients(selected_tuple)
             self.ingredients_print.delete(0, END)
             self.ingredients_print.insert(0, row[0][0])
@@ -37,7 +35,7 @@ class Application(Frame):
         self.ideas_print.delete(0, END)
         self.ingredients_print.delete(0, END)
         row = database.draw()
-        self.ideas_print.insert(0, row[0][1])
+        self.ideas_print.insert(0, row[0][1].capitalize())
         self.ingredients_print.insert(0, row[0][2])
         pass
 
@@ -45,16 +43,15 @@ class Application(Frame):
         self.ideas_print.delete(0, END)
         self.ingredients_print.delete(0, END)
         for row in database.all():
-            self.ideas_print.insert(END, row[1])
-            #print(row) # for debuging
+            self.ideas_print.insert(END, row[1].capitalize())
 
-    def adding_window(self): #TODO prevent to double add the same idea
+    def adding_window(self):
         self.new_window = Toplevel(self.master)
         self.app = Adding_window(self.new_window)
 
     def delete_command(self):
         if tkmessagebox.askokcancel('Potwierdzenie', 'Na pewno usunąć pomysł?'):
-            database.delete(selected_tuple)
+            database.delete(selected_tuple.lower())
             self.all_command()
 
     def create_widgets(self):
@@ -84,12 +81,6 @@ class Application(Frame):
         self.ingredients_print.configure(yscrollcommand=sb2.set)
         sb2.configure(command=self.ingredients_print.yview)
 
-        # Entry from earlier version
-        #
-        # self.danie_text = StringVar()
-        # self.e1 = Entry(self.right_frame, textvariable=self.danie_text)
-        # self.e1.grid(row=0, column=0, pady=20)
-
         b1 = Button(self.right_frame, text='Losuj', height=3, width=12, command=self.random_command)
         b1.grid(row=2, column=0, padx=20)
 
@@ -117,17 +108,28 @@ class Adding_window:
         self.master.bind('<Return>', self.add_command)
         self.master.bind('<Escape>', self.close)
 
-    def add_command(self, event):
-        if tkmessagebox.askokcancel('Potwierdzenie', 'Na pewno?'):
-            database.insert(self.new_idea.get(), self.new_ingredients.get())
-            self.master.destroy()
+    def add_command(self, *event):
+
+        idea = self.new_idea.get().lower()
+        ingredients = self.new_ingredients.get().lower()
+
+        if len(idea) > 0 and len(ingredients) > 0:
+            if tkmessagebox.askokcancel('Potwierdzenie', 'Na pewno?'):
+                check_result = database.check(idea)
+                if not check_result:
+                    database.insert(idea.lower(), ingredients)
+                    self.master.destroy()
+                else:
+                    tkmessagebox.showerror('Błąd', 'Taki pomysł już jest w bazie danych!')
+        else:
+            tkmessagebox.showerror('Błąd', 'Nie wprowadziłeś pomysłu i/lub składników!')
 
     def close(self, event):
         self.master.destroy()
 
     def create_adding_widgets(self):
 
-        l1 = Label(self.master, text='Przepis')
+        l1 = Label(self.master, text='Pomysł')
         l1.grid(row=0, column=0, padx=30, pady=5, sticky='ew')
 
         self.new_idea = StringVar()
