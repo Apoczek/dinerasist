@@ -1,4 +1,4 @@
-# Dinner decision helper - Obiadowy wspomagacz decyzyji
+# Dinner decision helper - Obiadowy wspomagacz decyzji
 
 Quite simple program with use of tkinter and sqlite where You create a database of your dinner ideas with the ingredients needed.
 After that when You wonder what to do for dinner You can simply draw an idea.
